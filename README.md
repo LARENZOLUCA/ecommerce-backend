@@ -340,29 +340,97 @@ jwt:
 ### Регистрация
 
 ```bash
-curl -X POST http://localhost:8080/auth/register \\
-  -H "Content-Type: application/json" \\
-  -d '{"email":"user@example.com","password":"123456","firstName":"John","lastName":"Doe"}'
+$body = @{
+    email = "user@example.com"
+    password = "123456"
+    firstName = "John"
+    lastName = "Doe"
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "http://localhost:8080/auth/register" `
+  -Method Post `
+  -Body $body `
+  -ContentType "application/json"
 ```
 
 
 ### Логин
 
 ```bash
-curl -X POST http://localhost:8080/auth/login \\
-  -H "Content-Type: application/json" \\
-  -d '{"email":"user@example.com","password":"123456"}'
+$loginBody = @{
+    email = "user@example.com"
+    password = "123456"
+} | ConvertTo-Json
+
+$response = Invoke-RestMethod -Uri "http://localhost:8080/auth/login" `
+  -Method Post `
+  -Body $loginBody `
+  -ContentType "application/json"
+
+$token = $response.token
+Write-Host "Токен: $token"
 ```
 
 
 ### Создание заказа
 
 ```bash
-curl -X POST http://localhost:8080/orders \\
-  -H "Authorization: Bearer <token>" \\
-  -H "Content-Type: application/json" \\
-  -d '{"items":[{"productId":1,"quantity":2}]}'
+$orderBody = @{
+    items = @(
+        @{ productId = 1; quantity = 2 }
+    )
+} | ConvertTo-Json
+
+$headers = @{ Authorization = "Bearer $token" }
+
+Invoke-RestMethod -Uri "http://localhost:8080/orders" `
+  -Method Post `
+  -Headers $headers `
+  -Body $orderBody `
+  -ContentType "application/json"
 ```
 
 
+### Получение списка товаров
+```bash
+Invoke-RestMethod -Uri "http://localhost:8080/products" | ConvertTo-Json -Depth 3
+```
 
+
+### Создание товара (только ADMIN)
+```bash
+$productBody = @{
+    name = "Новый товар"
+    description = "Описание товара"
+    price = 999.99
+    stock = 10
+} | ConvertTo-Json
+
+$headers = @{ Authorization = "Bearer $adminToken" }
+
+Invoke-RestMethod -Uri "http://localhost:8080/products" `
+  -Method Post `
+  -Headers $headers `
+  -Body $productBody `
+  -ContentType "application/json"
+```
+
+
+### История заказов
+```bash
+$headers = @{ Authorization = "Bearer $token" }
+
+Invoke-RestMethod -Uri "http://localhost:8080/orders" `
+  -Headers $headers | ConvertTo-Json -Depth 3
+```
+
+
+### Отмена заказа
+```bash
+$orderId = 1
+$headers = @{ Authorization = "Bearer $token" }
+
+Invoke-RestMethod -Uri "http://localhost:8080/orders/$orderId" `
+  -Method Delete `
+  -Headers $headers
+```
