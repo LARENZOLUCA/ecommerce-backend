@@ -1,0 +1,29 @@
+ktor:
+  application:
+    modules:
+      - com.example.ApplicationKt.module
+  deployment:
+    port: 8080
+
+database:
+  url: "jdbc:postgresql://localhost:5432/ecommerce"
+  user: "postgres"
+  password: "postgres"
+  maxPoolSize: 10
+
+redis:
+  host: "localhost"
+  port: 6379
+
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  username: "guest"
+  password: "guest"
+  queueName: "order-events"
+
+jwt:
+  secret: "my-super-secret-key-2024-change-this-in-production"
+  issuer: "ecommerce-app"
+  audience: "ecommerce-users"
+  expiresIn: 86400000

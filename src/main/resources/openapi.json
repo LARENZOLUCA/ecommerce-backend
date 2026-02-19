@@ -1,0 +1,481 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "E-commerce API",
+    "version": "1.0.0",
+    "description": "API для интернет-магазина с товарами и заказами"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Аутентификация"],
+        "summary": "Регистрация нового пользователя",
+        "description": "Создает нового пользователя и возвращает JWT токен",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "user@example.com" },
+                  "password": { "type": "string", "example": "password123" },
+                  "firstName": { "type": "string", "example": "Иван" },
+                  "lastName": { "type": "string", "example": "Иванов" }
+                },
+                "required": ["email", "password", "firstName", "lastName"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Пользователь успешно создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIs..." },
+                    "userId": { "type": "integer", "example": 1 },
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role": { "type": "string", "example": "USER" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email уже зарегистрирован или неверный формат данных"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Аутентификация"],
+        "summary": "Вход в систему",
+        "description": "Аутентификация пользователя и получение JWT токена",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "user@example.com" },
+                  "password": { "type": "string", "example": "password123" }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный вход",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIs..." },
+                    "userId": { "type": "integer", "example": 1 },
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role": { "type": "string", "example": "USER" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверный email или пароль"
+          }
+        }
+      }
+    },
+    "/user/profile": {
+      "get": {
+        "tags": ["Пользователь"],
+        "summary": "Профиль пользователя",
+        "description": "Возвращает информацию о текущем авторизованном пользователе",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Информация о пользователе",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": { "type": "integer", "example": 1 },
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role": { "type": "string", "example": "USER" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован"
+          }
+        }
+      }
+    },
+    "/products": {
+      "get": {
+        "tags": ["Товары"],
+        "summary": "Получить все товары",
+        "description": "Возвращает список всех доступных товаров",
+        "responses": {
+          "200": {
+            "description": "Список товаров",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "example": 1 },
+                      "name": { "type": "string", "example": "Ноутбук" },
+                      "description": { "type": "string", "example": "Мощный ноутбук для игр" },
+                      "price": { "type": "number", "example": 999.99 },
+                      "stock": { "type": "integer", "example": 10 },
+                      "createdAt": { "type": "string", "format": "date-time" },
+                      "updatedAt": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Админ"],
+        "summary": "Создать товар",
+        "description": "Создает новый товар (только для администраторов)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Ноутбук" },
+                  "description": { "type": "string", "example": "Мощный ноутбук для игр" },
+                  "price": { "type": "number", "example": 999.99 },
+                  "stock": { "type": "integer", "example": 10 }
+                },
+                "required": ["name", "description", "price", "stock"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Товар создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "Ноутбук" },
+                    "description": { "type": "string", "example": "Мощный ноутбук для игр" },
+                    "price": { "type": "number", "example": 999.99 },
+                    "stock": { "type": "integer", "example": 10 },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Не авторизован" },
+          "403": { "description": "Доступ запрещен (требуются права ADMIN)" }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Товары"],
+        "summary": "Получить товар по ID",
+        "description": "Возвращает информацию о конкретном товаре",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о товаре",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "Ноутбук" },
+                    "description": { "type": "string", "example": "Мощный ноутбук для игр" },
+                    "price": { "type": "number", "example": 999.99 },
+                    "stock": { "type": "integer", "example": 10 },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Товар не найден" }
+        }
+      },
+      "put": {
+        "tags": ["Админ"],
+        "summary": "Обновить товар",
+        "description": "Обновляет существующий товар (только для администраторов)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Ноутбук обновленный" },
+                  "description": { "type": "string", "example": "Новое описание" },
+                  "price": { "type": "number", "example": 899.99 },
+                  "stock": { "type": "integer", "example": 15 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Товар обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "name": { "type": "string", "example": "Ноутбук обновленный" },
+                    "description": { "type": "string", "example": "Новое описание" },
+                    "price": { "type": "number", "example": 899.99 },
+                    "stock": { "type": "integer", "example": 15 },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Не авторизован" },
+          "403": { "description": "Доступ запрещен (требуются права ADMIN)" },
+          "404": { "description": "Товар не найден" }
+        }
+      },
+      "delete": {
+        "tags": ["Админ"],
+        "summary": "Удалить товар",
+        "description": "Удаляет существующий товар (только для администраторов)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Товар удален" },
+          "401": { "description": "Не авторизован" },
+          "403": { "description": "Доступ запрещен (требуются права ADMIN)" },
+          "404": { "description": "Товар не найден" }
+        }
+      }
+    },
+    "/orders": {
+      "post": {
+        "tags": ["Заказы"],
+        "summary": "Создать заказ",
+        "description": "Создает новый заказ из списка товаров",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "productId": { "type": "integer", "example": 1 },
+                        "quantity": { "type": "integer", "example": 2 }
+                      },
+                      "required": ["productId", "quantity"]
+                    }
+                  }
+                },
+                "required": ["items"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Заказ создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "example": 1 },
+                    "status": { "type": "string", "example": "PENDING" },
+                    "totalAmount": { "type": "number", "example": 1999.98 },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "productId": { "type": "integer", "example": 1 },
+                          "productName": { "type": "string", "example": "Ноутбук" },
+                          "quantity": { "type": "integer", "example": 2 },
+                          "price": { "type": "number", "example": 999.99 },
+                          "subtotal": { "type": "number", "example": 1999.98 }
+                        }
+                      }
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Недостаточно товара или неверный запрос" },
+          "401": { "description": "Не авторизован" }
+        }
+      },
+      "get": {
+        "tags": ["Заказы"],
+        "summary": "Получить заказы пользователя",
+        "description": "Возвращает список всех заказов текущего пользователя",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Список заказов",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer", "example": 1 },
+                      "status": { "type": "string", "example": "PENDING" },
+                      "totalAmount": { "type": "number", "example": 1999.98 },
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "productId": { "type": "integer", "example": 1 },
+                            "productName": { "type": "string", "example": "Ноутбук" },
+                            "quantity": { "type": "integer", "example": 2 },
+                            "price": { "type": "number", "example": 999.99 },
+                            "subtotal": { "type": "number", "example": 1999.98 }
+                          }
+                        }
+                      },
+                      "createdAt": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Не авторизован" }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "delete": {
+        "tags": ["Заказы"],
+        "summary": "Отменить заказ",
+        "description": "Отменяет заказ и возвращает товары на склад",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "example": 1 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Заказ отменен" },
+          "400": { "description": "Заказ нельзя отменить или неверный ID" },
+          "401": { "description": "Не авторизован" },
+          "404": { "description": "Заказ не найден" }
+        }
+      }
+    },
+    "/stats/orders": {
+      "get": {
+        "tags": ["Админ"],
+        "summary": "Статистика заказов",
+        "description": "Возвращает статистику по заказам (только для администраторов)",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Статистика",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string", "example": "Orders statistics - будет реализовано (только admin)" }
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Доступ запрещен" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {}
+  }
+}
