@@ -73,7 +73,7 @@ Backend-сервис интернет-магазина на Ktor с JWT авто
 ### 1. Клонирование репозитория
 
 ```bash
-git clone [https://github.com/your-username/ecommerce-backend.git](https://github.com/your-username/ecommerce-backend.git)
+git clone [https://github.com/LARENZOLUCA/ecommerce-backend.git](https://github.com/LARENZOLUCA/ecommerce-backend.git)
 cd ecommerce-backend
 ```
 
