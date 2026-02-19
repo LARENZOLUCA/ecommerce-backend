@@ -365,20 +365,4 @@ curl -X POST http://localhost:8080/orders \\
 ```
 
 
-## Вклад в проект
 
-1. Fork репозитория
-2. Создайте ветку для фичи (`git checkout -b feature/amazing-feature`)
-3. Commit изменений (`git commit -m 'Add some amazing feature'`)
-4. Push в ветку (`git push origin feature/amazing-feature`)
-5. Откройте Pull Request
-
-## Лицензия
-
-MIT
-
-## Контакты
-
-Ваше имя - [@yourusername](https://github.com/yourusername)
-
-Ссылка на проект: [https://github.com/yourusername/ecommerce-backend](https://github.com/yourusername/ecommerce-backend)
