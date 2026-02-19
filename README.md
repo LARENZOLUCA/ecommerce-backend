@@ -353,6 +353,13 @@ Invoke-RestMethod -Uri "http://localhost:8080/auth/register" `
   -ContentType "application/json"
 ```
 
+### Назначание роли Admin 
+
+```bash
+docker exec -it ecommerce-postgres psql -U postgres -d ecommerce -c "UPDATE users SET role = 'ADMIN' WHERE email = 'admin@example.com';"
+docker exec -it ecommerce-postgres psql -U postgres -d ecommerce -c "SELECT id, email, role FROM users WHERE email = 'admin@example.com';"
+```
+
 
 ### Логин
 
@@ -371,7 +378,24 @@ $token = $response.token
 Write-Host "Токен: $token"
 ```
 
+### Логин как Admin
+```bash
+$adminLoginBody = @{
+    email = "admin@example.com"
+    password = "admin123"
+} | ConvertTo-Json
 
+$response = Invoke-RestMethod -Uri "http://localhost:8080/auth/login" `
+  -Method Post `
+  -Body $adminLoginBody `
+  -ContentType "application/json"
+
+$adminToken = $response.token
+$adminHeaders = @{ Authorization = "Bearer $adminToken" }
+
+Write-Host "Токен админа: $adminToken"
+Write-Host "Роль: $($response.role)"
+```
 ### Создание заказа
 
 ```bash
